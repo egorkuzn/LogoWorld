@@ -39,6 +39,7 @@ public class Teleport implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) {
-
+        robot.setCoordinates(x, y);
+        field.displayRobot(robot);
     }
 }

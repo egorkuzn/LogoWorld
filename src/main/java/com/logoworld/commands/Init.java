@@ -44,6 +44,12 @@ public class Init implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) {
-
+        try {
+            field.setDisplayedSurface(height, width);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        robot.setCoordinates(x, y);
+        field.displayRobot(robot);
     }
 }

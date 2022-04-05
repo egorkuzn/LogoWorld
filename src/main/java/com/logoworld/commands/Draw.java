@@ -11,6 +11,6 @@ public class Draw implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) {
-
+        robot.setDrawerStatus(true);
     }
 }

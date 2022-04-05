@@ -4,20 +4,19 @@ import com.logoworld.commands.*;
 import com.logoworld.environment.Field;
 import com.logoworld.environment.Robot;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
 public class Manager {
     BufferedReader reader;
     Field field = null;
     Robot robot = null;
     ArrayList<CommandAI> managerTask = null;
-
+    HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
     public Manager(){
         reader = new BufferedReader(new InputStreamReader(System.in));
+        getAllCommands();
         getCommandsCall();
     }
 
@@ -50,34 +49,37 @@ public class Manager {
             param = commandString.substring(space_idx + 1);
         }
 
-        CommandAI commandAI_tmp;
-        boolean error_catcher;
-        switch(nameOfCommand){
-            case "INIT":
-                commandAI_tmp = new Init();
-                break;
-            case "MOVE":
-                commandAI_tmp = new Move();
-                break;
-            case "DRAW":
-                commandAI_tmp = new Draw();
-                break;
-            case "WARD":
-                commandAI_tmp = new Ward();
-                break;
-            case "TELEPORT":
-                commandAI_tmp = new Teleport();
-                break;
-            default:
-                commandAI_tmp = null;
+        CommandAI commandAI = null;
+
+        if(cashHistory.containsKey(nameOfCommand)) {
+            commandAI = cashHistory.get(nameOfCommand);
+            commandAI.getParam(param);
         }
 
-        if(commandAI_tmp == null || !commandAI_tmp.getParam(param)) {
-            commandAI_tmp = null;
-            System.out.println("Maybe you made some mistake while was typing." +
-                    "Don't worry: just rewrite what you want once again.");
-        }
+        return commandAI;
+    }
 
-        return commandAI_tmp;
+    private void getAllCommands(){
+        InputStream inputStream;
+
+        try{
+            Properties prop = new Properties();
+            final String propFileName = "commands.properties";
+
+            inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+
+            if(inputStream != null)
+                prop.load(inputStream);
+            else
+                throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+
+
+            for (Map.Entry<?,?> entry: prop.entrySet()){
+                CommandAI obj = (CommandAI) Class.forName((String) entry.getValue()).newInstance();
+                cashHistory.put((String)entry.getKey(), obj);
+            }
+        } catch (IOException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
