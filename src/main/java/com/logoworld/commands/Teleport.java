@@ -2,6 +2,8 @@ package com.logoworld.commands;
 
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
+import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.NotInitSurface;
 
 public class Teleport implements CommandAI{
     public int x;
@@ -38,8 +40,10 @@ public class Teleport implements CommandAI{
     }
 
     @Override
-    public void action(Field field, Robot robot) {
-        robot.setCoordinates(x, y);
-        field.displayRobot(robot);
+    public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
+        if(!robot.setCoordinates(x, y))
+            throw new BadCoordinates(robot.X(), robot.Y(), "TELEPORT");
+        if(!field.displayRobot(robot))
+            throw new NotInitSurface("null surface of Field", "TELEPORT");
     }
 }

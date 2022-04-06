@@ -1,7 +1,9 @@
 package com.logoworld.environment;
 
+import com.logoworld.exceptions.BadCoordinates;
+
 public class Robot {
-    private int x, y;
+    private int x, y, xLimit, yLimit;
     private boolean drawerStatus;
     private String iconPath;
 
@@ -9,9 +11,18 @@ public class Robot {
         drawerStatus = newStatus;
     }
 
-    public void setCoordinates(int x, int y){
-        this.x = x;
-        this.y = y;
+    public void setLimits(int xLimit, int yLimit){
+        this.xLimit = xLimit;
+        this.yLimit = yLimit;
+    }
+
+    public boolean setCoordinates(int x, int y){
+        if(x < xLimit && y < yLimit) {
+            this.x = x;
+            this.y = y;
+            return true;
+        } else
+            return false;
     }
 
     public int X(){

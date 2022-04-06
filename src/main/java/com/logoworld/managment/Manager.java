@@ -3,16 +3,18 @@ package com.logoworld.managment;
 import com.logoworld.commands.*;
 import com.logoworld.environment.Field;
 import com.logoworld.environment.Robot;
+import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.NotInitSurface;
 
 import java.io.*;
 import java.util.*;
 
 public class Manager {
-    BufferedReader reader;
-    Field field = null;
-    Robot robot = null;
-    ArrayList<CommandAI> managerTask = null;
-    HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
+    private BufferedReader reader;
+    private Field field = new Field();
+    private Robot robot = null;
+    private ArrayList<CommandAI> managerTask = null;
+    private HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
     public Manager(){
         reader = new BufferedReader(new InputStreamReader(System.in));
@@ -36,8 +38,15 @@ public class Manager {
             managerTask.add(makeCommand(s));
 
         for(CommandAI commandAI: managerTask)
-            if(commandAI != null)
-                commandAI.action(field, robot);
+            if(commandAI != null) {
+                try {
+                    commandAI.action(field, robot);
+                } catch (NotInitSurface e) {
+                    e.printStackTrace();
+                } catch (BadCoordinates e) {
+                    e.printStackTrace();
+                }
+            }
     }
 
     private CommandAI makeCommand(String commandString){

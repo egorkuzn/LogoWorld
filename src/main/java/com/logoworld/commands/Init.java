@@ -2,6 +2,8 @@ package com.logoworld.commands;
 
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
+import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.NotInitSurface;
 
 public class Init implements CommandAI{
     private int height;
@@ -43,13 +45,17 @@ public class Init implements CommandAI{
     }
 
     @Override
-    public void action(Field field, Robot robot) {
+    public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
         try {
-            field.setDisplayedSurface(height, width);
+            field.setDisplayedSurface(height, width, robot);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        robot.setCoordinates(x, y);
-        field.displayRobot(robot);
+
+        if(!field.displayRobot(robot))
+            throw new NotInitSurface("null surface of Filed", "INIT");
+
+        if(!robot.setCoordinates(x, y))
+            throw new BadCoordinates(x, y, "INIT");
     }
 }
