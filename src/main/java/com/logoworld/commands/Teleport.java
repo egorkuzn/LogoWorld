@@ -41,6 +41,8 @@ public class Teleport implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
+        field.hideRobot(robot);
+
         if(!robot.setCoordinates(x, y))
             throw new BadCoordinates(robot.X(), robot.Y(), "TELEPORT");
         if(!field.displayRobot(robot))

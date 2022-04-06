@@ -17,7 +17,11 @@ public class Manager {
     private HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
     public Manager(){
-        reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            reader = new BufferedReader(new FileReader("C:\\Users\\egork\\IdeaProjects\\LogoWorld\\src\\main\\java\\com\\logoworld\\managment\\todo.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         getAllCommands();
         getCommandsCall();
     }
@@ -64,7 +68,7 @@ public class Manager {
             commandAI = cashHistory.get(nameOfCommand);
             commandAI.getParam(param);
         }
-
+//think about "else" block there
         return commandAI;
     }
 

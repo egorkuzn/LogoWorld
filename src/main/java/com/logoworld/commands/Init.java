@@ -36,8 +36,8 @@ public class Init implements CommandAI{
 
         String[] arr = param.split(" ");
 
-        height = convert(arr[0]);
-        width = convert(arr[1]);
+        width = convert(arr[0]);
+        height = convert(arr[1]);
         x = convert(arr[2]);
         y = convert(arr[3]);
 
@@ -47,7 +47,7 @@ public class Init implements CommandAI{
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
         try {
-            field.setDisplayedSurface(height, width, robot);
+            field.setDisplayedSurface(width, height, robot);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

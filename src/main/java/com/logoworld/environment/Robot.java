@@ -1,11 +1,13 @@
 package com.logoworld.environment;
 
-import com.logoworld.exceptions.BadCoordinates;
-
 public class Robot {
     private int x, y, xLimit, yLimit;
     private boolean drawerStatus;
     private String iconPath;
+
+    public boolean getDrawerStatus(){
+        return drawerStatus;
+    }
 
     public void setDrawerStatus(boolean newStatus){
         drawerStatus = newStatus;

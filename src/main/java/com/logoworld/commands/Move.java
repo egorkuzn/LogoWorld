@@ -33,6 +33,8 @@ public class Move implements CommandAI{
     public void action(Field field, Robot robot) throws NotInitSurface, BadCoordinates {
         boolean isInSurface = false;
 
+        field.hideRobot(robot);
+
         switch (way){
             case 'L':
                 isInSurface = robot.setCoordinates(robot.X() - 1, robot.Y());
