@@ -12,8 +12,8 @@ import java.util.*;
 public class Manager {
     private BufferedReader reader;
     private Field field = new Field();
-    private Robot robot = null;
-    private ArrayList<CommandAI> managerTask = null;
+    private Robot robot = new Robot();
+    private ArrayList<CommandAI> managerTask = new ArrayList<CommandAI>();
     private HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
     public Manager(){
