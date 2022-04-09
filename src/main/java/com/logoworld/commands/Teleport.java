@@ -5,9 +5,13 @@ import com.logoworld.environment.Field;
 import com.logoworld.exceptions.BadCoordinates;
 import com.logoworld.exceptions.NotInitSurface;
 
+import java.util.ArrayList;
+
 public class Teleport implements CommandAI{
-    public int x;
-    public int y;
+    private ArrayList<String> paramQueue = new ArrayList<String>();
+    private int x;
+    private int y;
+    public String param = null;
 
     public int convert(String str)
     {
@@ -28,7 +32,12 @@ public class Teleport implements CommandAI{
     }
 
     @Override
-    public boolean getParam(String param) {
+    public void getParam(String param) {
+        paramQueue.add(param);
+    }
+
+    @Override
+    public boolean runParam(String param) {
         if(!param.matches("^\\d\\s\\d$"))
             return false;
 
@@ -41,11 +50,23 @@ public class Teleport implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
+        runParam(paramQueue.get(0));
+        paramQueue.remove(0);
+
         field.hideRobot(robot);
 
         if(!robot.setCoordinates(x, y))
             throw new BadCoordinates(robot.X(), robot.Y(), "TELEPORT");
         if(!field.displayRobot(robot))
             throw new NotInitSurface("null surface of Field", "TELEPORT");
+    }
+
+    @Override
+    public void clone(CommandAI commandAI) throws CloneNotSupportedException {
+        if(commandAI.getClass() == this.getClass()){
+            this.param = ((Teleport) commandAI).param;
+            runParam(this.param);
+        } else
+            throw new CloneNotSupportedException();
     }
 }

@@ -1,7 +1,7 @@
 package com.logoworld.environment;
 
 public class Robot {
-    private int x, y, xLimit, yLimit;
+    private int x = 0, y = 0, xLimit, yLimit;
     private boolean drawerStatus;
     private String iconPath;
 

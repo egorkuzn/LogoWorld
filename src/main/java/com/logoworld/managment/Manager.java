@@ -45,9 +45,12 @@ public class Manager {
             if(commandAI != null) {
                 try {
                     commandAI.action(field, robot);
+                    Thread.sleep(1000);
                 } catch (NotInitSurface e) {
                     e.printStackTrace();
                 } catch (BadCoordinates e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -62,7 +65,7 @@ public class Manager {
             param = commandString.substring(space_idx + 1);
         }
 
-        CommandAI commandAI = null;
+        CommandAI commandAI = null ; //exception
 
         if(cashHistory.containsKey(nameOfCommand)) {
             commandAI = cashHistory.get(nameOfCommand);

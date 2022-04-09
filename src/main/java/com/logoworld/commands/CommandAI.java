@@ -6,6 +6,8 @@ import com.logoworld.exceptions.BadCoordinates;
 import com.logoworld.exceptions.NotInitSurface;
 
 public interface CommandAI {
-    boolean getParam(String param);
+    void getParam(String param);
+    boolean runParam(String param);
     void action(Field field, Robot robot) throws NotInitSurface, BadCoordinates;
+    void clone(CommandAI commandAI) throws CloneNotSupportedException;
 }

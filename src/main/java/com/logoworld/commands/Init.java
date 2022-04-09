@@ -5,11 +5,15 @@ import com.logoworld.environment.Field;
 import com.logoworld.exceptions.BadCoordinates;
 import com.logoworld.exceptions.NotInitSurface;
 
+import java.util.ArrayList;
+
 public class Init implements CommandAI{
+    private ArrayList<String> paramQueue = new ArrayList<String>();
     private int height;
     private int width;
     private int x;
     private int y;
+    public String param = null;
 
     public int convert(String str)
     {
@@ -30,10 +34,16 @@ public class Init implements CommandAI{
     }
 
     @Override
-    public boolean getParam(String param) {
+    public void getParam(String param) {
+        paramQueue.add(param);
+    }
+
+    @Override
+    public boolean runParam(String param) {
         if(!param.matches("^\\d+\\s+\\d+\\s+\\d+\\s+\\d$"))
             return false;
 
+        this.param = param;
         String[] arr = param.split(" ");
 
         width = convert(arr[0]);
@@ -46,9 +56,18 @@ public class Init implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
+        runParam(paramQueue.get(0));
+        paramQueue.remove(0);
+
+        robot.setLimits(width, height);
+
         try {
+            if(!robot.setCoordinates(x,y))
+                throw new BadCoordinates(x, y, "INIT");
             field.setDisplayedSurface(width, height, robot);
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BadCoordinates e){
             e.printStackTrace();
         }
 
@@ -57,5 +76,14 @@ public class Init implements CommandAI{
 
         if(!robot.setCoordinates(x, y))
             throw new BadCoordinates(x, y, "INIT");
+    }
+
+    @Override
+    public void clone(CommandAI commandAI) throws CloneNotSupportedException {
+        if(commandAI.getClass() == this.getClass()){
+            this.param = ((Init) commandAI).param;
+            runParam(this.param);
+        } else
+            throw new CloneNotSupportedException();
     }
 }
