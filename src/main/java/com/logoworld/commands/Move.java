@@ -3,25 +3,42 @@ package com.logoworld.commands;
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
 import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.BadParam;
 import com.logoworld.exceptions.NotInitSurface;
 
 import java.util.ArrayList;
 
 public class Move implements CommandAI{
-    private ArrayList<String> paramQueue = new ArrayList<String>();
     private char way;
+    private int steps;
     public String param;
 
-    @Override
-    public void getParam(String param) {
-        paramQueue.add(param);
+    private int convert(String str)
+    {
+        int value = 0;
+        System.out.println("String = " + str);
+
+        // Convert the String
+        try {
+            value = Integer.parseInt(str);
+        }
+        catch (NumberFormatException e) {
+
+            // This is thrown when the String
+            // contains characters other than digits
+            System.out.println("Invalid String");
+        }
+        return value;
     }
 
     @Override
-    public boolean runParam(String param) {
-        this.param = param;
+    public void getParam(String param) throws BadParam {
+        if(!param.matches("^\\w+\\s+\\d$"))
+            throw new BadParam("MOVE");
 
-        switch (param){
+        String[] arr = param.split("\\s+");
+
+        switch (arr[0]){
             case "L":
                 way = 'L';
                 break;
@@ -35,48 +52,60 @@ public class Move implements CommandAI{
                 way = 'D';
                 break;
             default:
-                return false;
+                throw new BadParam("MOVE :: bad symbol of direction");
         }
 
-        return true;
+        steps = Integer.parseInt(arr[1]);
+
+        if(steps < 0)
+            throw new BadParam("MOVE :: negative count of steps");
     }
 
     @Override
     public void action(Field field, Robot robot) throws NotInitSurface, BadCoordinates {
-        runParam(paramQueue.get(0));
-        paramQueue.remove(0);
+        if(!field.isInited())
+            throw new NotInitSurface("no INITed", "MOVE");
 
-        boolean isInSurface = false;
+        for(int i = 0; i < steps; ++i){
+            field.hideRobot(robot);
 
-        field.hideRobot(robot);
+            switch (way){
+                case 'L':
+                    robot.moveLeft();
+                    break;
+                case 'R':
+                    robot.moveRight();
+                    break;
+                case 'U':
+                    robot.moveUp();
+                    break;
+                case 'D':
+                    robot.moveDown();
+                    break;
+            }
 
-        switch (way){
-            case 'L':
-                isInSurface = robot.setCoordinates(robot.X() - 1, robot.Y());
-                break;
-            case 'R':
-                isInSurface = robot.setCoordinates(robot.X() + 1, robot.Y());
-                break;
-            case 'U':
-                isInSurface = robot.setCoordinates(robot.X(), robot.Y() - 1);
-                break;
-            case 'D':
-                isInSurface = robot.setCoordinates(robot.X(), robot.Y() + 1);
-                break;
+            if(!field.displayRobot(robot))
+                throw new NotInitSurface("null surface of Filed", "MOVE");
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
-        if(!isInSurface)
-            throw new BadCoordinates(robot.X(), robot.Y(), "MOVE");
-
-        if(!field.displayRobot(robot))
-            throw new NotInitSurface("null surface of Filed", "MOVE");
     }
 
     @Override
-    public void clone(CommandAI commandAI) throws CloneNotSupportedException {
+    public void action(Field field, Robot robot, String param) throws BadParam, NotInitSurface, BadCoordinates {
+        getParam(param);
+        action(field, robot);
+    }
+
+    @Override
+    public void clone(CommandAI commandAI) throws CloneNotSupportedException, BadParam {
         if(commandAI.getClass() == this.getClass()){
             this.param = ((Move) commandAI).param;
-            runParam(this.param);
+            getParam(this.param);
         } else
                 throw new CloneNotSupportedException();
     }

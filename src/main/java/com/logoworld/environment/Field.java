@@ -1,9 +1,13 @@
 package com.logoworld.environment;
 
 public class Field {
-    private int height, width;
+    private int height = 0, width = 0;
     private DisplayedSurface surface = null;
     private boolean[][] coloredPoints = null;
+
+    public boolean isInited(){
+        return surface != null;
+    }
 
     public void setDisplayedSurface(int width, int height, Robot robot) throws InterruptedException {
         surface = new DisplayedSurface(width, height, 50);
@@ -15,6 +19,9 @@ public class Field {
     public boolean hideRobot(Robot robot){
         if(surface != null){
             if(robot.getDrawerStatus())
+                addColoredPoint(robot.X(), robot.Y());
+
+            if(robot.getDrawerStatus() || isColoredPoint(robot.X(), robot.Y()))
                 surface.setCell(robot.X(), robot.Y(), CellType.COLOR);
             else
                 surface.setCell(robot.X(), robot.Y(), CellType.PURITY);

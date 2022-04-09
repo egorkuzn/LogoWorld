@@ -27,6 +27,22 @@ public class Robot {
             return false;
     }
 
+    public void moveLeft(){
+        x = (x + xLimit - 1) % xLimit;
+    }
+
+    public void moveRight(){
+        x = (x + xLimit + 1) % xLimit;
+    }
+
+    public void moveUp(){
+        y = (y + yLimit - 1) % yLimit;
+    }
+
+    public void moveDown(){
+        y = (y + yLimit + 1) % yLimit;
+    }
+
     public int X(){
         return x;
     }

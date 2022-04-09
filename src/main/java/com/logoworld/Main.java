@@ -7,6 +7,7 @@ import com.logoworld.managment.Manager;
 
 public class Main {
         public static void main(String[] args) {
-                Manager mngr = new Manager();
+                Manager manager = new Manager();
+                manager.getCommandsCall("C:\\Users\\egork\\IdeaProjects\\LogoWorld\\src\\main\\java\\com\\logoworld\\managment\\todo.txt");
         }
 }

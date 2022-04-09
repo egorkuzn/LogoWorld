@@ -3,20 +3,30 @@ package com.logoworld.commands;
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
 import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.BadParam;
 import com.logoworld.exceptions.NotInitSurface;
 
-import java.util.ArrayList;
-
 public class Init implements CommandAI{
-    private ArrayList<String> paramQueue = new ArrayList<String>();
     private int height;
     private int width;
     private int x;
     private int y;
     public String param = null;
 
-    public int convert(String str)
-    {
+    private boolean checkArgs(){
+        if(height <= 0)
+            return false;
+        if(width <= 0)
+            return false;
+        if(x > width || x < 0)
+            return false;
+        if(y > height || y < 0)
+            return false;
+
+        return true;
+    }
+
+    private int convert(String str) {
         int value = 0;
         System.out.println("String = " + str);
 
@@ -34,14 +44,10 @@ public class Init implements CommandAI{
     }
 
     @Override
-    public void getParam(String param) {
-        paramQueue.add(param);
-    }
-
-    @Override
-    public boolean runParam(String param) {
-        if(!param.matches("^\\d+\\s+\\d+\\s+\\d+\\s+\\d$"))
-            return false;
+    public void getParam(String param) throws BadParam {
+        if(!param.matches("^\\d+\\s+\\d+\\s+\\d+\\s+\\d$")) {
+            throw new BadParam("INIT");
+        }
 
         this.param = param;
         String[] arr = param.split(" ");
@@ -51,38 +57,35 @@ public class Init implements CommandAI{
         x = convert(arr[2]);
         y = convert(arr[3]);
 
-        return true;
+        if(!checkArgs()){
+            throw new BadParam("INIT");
+        }
     }
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
-        runParam(paramQueue.get(0));
-        paramQueue.remove(0);
-
-        robot.setLimits(width, height);
-
         try {
-            if(!robot.setCoordinates(x,y))
-                throw new BadCoordinates(x, y, "INIT");
             field.setDisplayedSurface(width, height, robot);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (BadCoordinates e){
-            e.printStackTrace();
         }
 
+        robot.setCoordinates(x,y);
         if(!field.displayRobot(robot))
             throw new NotInitSurface("null surface of Filed", "INIT");
-
-        if(!robot.setCoordinates(x, y))
-            throw new BadCoordinates(x, y, "INIT");
     }
 
     @Override
-    public void clone(CommandAI commandAI) throws CloneNotSupportedException {
+    public void action(Field field, Robot robot, String param) throws BadParam, NotInitSurface, BadCoordinates {
+        getParam(param);
+        action(field, robot);
+    }
+
+    @Override
+    public void clone(CommandAI commandAI) throws CloneNotSupportedException, BadParam {
         if(commandAI.getClass() == this.getClass()){
             this.param = ((Init) commandAI).param;
-            runParam(this.param);
+            getParam(this.param);
         } else
             throw new CloneNotSupportedException();
     }

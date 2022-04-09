@@ -3,17 +3,15 @@ package com.logoworld.commands;
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
 import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.BadParam;
 import com.logoworld.exceptions.NotInitSurface;
 
-import java.util.ArrayList;
-
 public class Teleport implements CommandAI{
-    private ArrayList<String> paramQueue = new ArrayList<String>();
     private int x;
     private int y;
     public String param = null;
 
-    public int convert(String str)
+    private int convert(String str)
     {
         int value = 0;
         System.out.println("String = " + str);
@@ -32,26 +30,20 @@ public class Teleport implements CommandAI{
     }
 
     @Override
-    public void getParam(String param) {
-        paramQueue.add(param);
-    }
-
-    @Override
-    public boolean runParam(String param) {
+    public void getParam(String param) throws BadParam {
         if(!param.matches("^\\d\\s\\d$"))
-            return false;
+            throw new BadParam("TELEPORT");
 
         String[] arr = param.split(" ");
+
         x = convert(arr[0]);
         y = convert(arr[1]);
-
-        return true;
     }
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
-        runParam(paramQueue.get(0));
-        paramQueue.remove(0);
+        if(!field.isInited())
+            throw new NotInitSurface("no inited", "TELEPORT");
 
         field.hideRobot(robot);
 
@@ -62,10 +54,16 @@ public class Teleport implements CommandAI{
     }
 
     @Override
-    public void clone(CommandAI commandAI) throws CloneNotSupportedException {
+    public void action(Field field, Robot robot, String param) throws BadParam, NotInitSurface, BadCoordinates {
+        getParam(param);
+        action(field, robot);
+    }
+
+    @Override
+    public void clone(CommandAI commandAI) throws CloneNotSupportedException, BadParam {
         if(commandAI.getClass() == this.getClass()){
             this.param = ((Teleport) commandAI).param;
-            runParam(this.param);
+            getParam(this.param);
         } else
             throw new CloneNotSupportedException();
     }

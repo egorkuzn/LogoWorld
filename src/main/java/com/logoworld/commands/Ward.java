@@ -2,28 +2,31 @@ package com.logoworld.commands;
 
 import com.logoworld.environment.Robot;
 import com.logoworld.environment.Field;
+import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.BadParam;
+import com.logoworld.exceptions.NotInitSurface;
 
 import java.util.ArrayList;
 
 public class Ward implements CommandAI{
-    private ArrayList<String> paramQueue = new ArrayList<String>();
-
     @Override
-    public void getParam(String param) {
-        paramQueue.add(param);
+    public void getParam(String param) throws BadParam {
+        if(param != null)
+            throw new BadParam("WARD");
     }
 
     @Override
-    public boolean runParam(String param) {
-        return param == null;
-    }
-
-    @Override
-    public void action(Field field, Robot robot) {
-        runParam(paramQueue.get(0));
-        paramQueue.remove(0);
+    public void action(Field field, Robot robot) throws NotInitSurface {
+        if(!field.isInited())
+            throw new NotInitSurface("no inited", "MOVE");
 
         robot.setDrawerStatus(false);
+    }
+
+    @Override
+    public void action(Field field, Robot robot, String param) throws BadParam, NotInitSurface, BadCoordinates {
+        getParam(param);
+        action(field, robot);
     }
 
     @Override

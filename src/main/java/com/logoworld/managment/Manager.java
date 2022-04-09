@@ -3,31 +3,30 @@ package com.logoworld.managment;
 import com.logoworld.commands.*;
 import com.logoworld.environment.Field;
 import com.logoworld.environment.Robot;
+import com.logoworld.exceptions.BadCommand;
 import com.logoworld.exceptions.BadCoordinates;
+import com.logoworld.exceptions.BadParam;
 import com.logoworld.exceptions.NotInitSurface;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Manager {
-    private BufferedReader reader;
+    private BufferedReader reader = null;
     private Field field = new Field();
     private Robot robot = new Robot();
+    private String toDo = null;
     private ArrayList<CommandAI> managerTask = new ArrayList<CommandAI>();
     private HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
     public Manager(){
-        try {
-            reader = new BufferedReader(new FileReader("C:\\Users\\egork\\IdeaProjects\\LogoWorld\\src\\main\\java\\com\\logoworld\\managment\\todo.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
         getAllCommands();
-        getCommandsCall();
     }
 
-    public void getCommandsCall(){
+    public void getCommandsCall(String toDo){
         try {
+            reader = new BufferedReader(new FileReader(toDo));
             String call = reader.readLine();
             run(call);
         } catch (IOException e) {
@@ -36,27 +35,18 @@ public class Manager {
     }
 
     private void run(String call){
-        String[] callArr = call.split(">");
+        String[] callArr = call.split("\\s*+>+\\s*");
 
-        for (String s : callArr)
-            managerTask.add(makeCommand(s));
-
-        for(CommandAI commandAI: managerTask)
-            if(commandAI != null) {
-                try {
-                    commandAI.action(field, robot);
-                    Thread.sleep(1000);
-                } catch (NotInitSurface e) {
-                    e.printStackTrace();
-                } catch (BadCoordinates e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        for (String s : callArr) {
+            try {
+                runCommand(s, field, robot);
+            } catch (BadCommand e) {
+                e.printStackTrace();
             }
+        }
     }
 
-    private CommandAI makeCommand(String commandString){
+    private void runCommand (String commandString, Field field, Robot robot) throws BadCommand {
         int space_idx = commandString.indexOf(" ");
         String nameOfCommand = commandString, param = null;
 
@@ -65,18 +55,82 @@ public class Manager {
             param = commandString.substring(space_idx + 1);
         }
 
-        CommandAI commandAI = null ; //exception
+        CommandAI commandAI = null; //exception
 
-        if(cashHistory.containsKey(nameOfCommand)) {
+        if(doesExist(nameOfCommand)) {
             commandAI = cashHistory.get(nameOfCommand);
-            commandAI.getParam(param);
+            try {
+                commandAI.action(field, robot, param);
+                Thread.sleep(250);
+            } catch (BadCoordinates e) {
+                e.printStackTrace();
+            } catch (BadParam e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (NotInitSurface e) {
+                e.printStackTrace();
+            }
+        } else{
+            throw new BadCommand(nameOfCommand);
         }
-//think about "else" block there
-        return commandAI;
+    }
+
+    private boolean doesExist(String nameOfCommand){
+        if(cashHistory.containsKey(nameOfCommand)) {
+            return cashHistory.get(nameOfCommand) != null;
+        }
+        else {
+            tryToFindCommand(nameOfCommand);
+            return cashHistory.containsKey(nameOfCommand) && (cashHistory.get(nameOfCommand) != null);
+        }
+    }
+
+    private void tryToFindCommand(String nameOfCommand){
+        InputStream inputStream = null;
+        CommandAI commandAI = null;
+
+        try {
+            Properties prop = new Properties();
+            final String propFileName = "additional.properties";
+            inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+
+            if(inputStream != null)
+                prop.load(inputStream);
+            else
+                throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
+
+            final String commandPath = prop.getProperty(nameOfCommand);
+            commandAI = (CommandAI) Class.forName(commandPath).getDeclaredConstructor().newInstance();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+        }
+
+        try {
+            if(commandAI == null)
+                throw new BadCommand(nameOfCommand);
+            else
+                cashHistory.put(nameOfCommand, commandAI);
+        } catch (BadCommand e) {
+            e.printStackTrace();
+        }
     }
 
     private void getAllCommands(){
-        InputStream inputStream;
+        InputStream inputStream = null;
 
         try{
             Properties prop = new Properties();
@@ -91,10 +145,23 @@ public class Manager {
 
 
             for (Map.Entry<?,?> entry: prop.entrySet()){
-                CommandAI obj = (CommandAI) Class.forName((String) entry.getValue()).newInstance();
+                //take constructor of class
+                CommandAI obj = (CommandAI) Class.forName((String) entry.getValue()).getDeclaredConstructor().newInstance();
                 cashHistory.put((String)entry.getKey(), obj);
             }
-        } catch (IOException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
     }
