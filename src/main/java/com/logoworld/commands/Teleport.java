@@ -31,10 +31,10 @@ public class Teleport implements CommandAI{
 
     @Override
     public void getParam(String param) throws BadParam {
-        if(!param.matches("^\\d\\s\\d$"))
+        if(param == null || !param.matches("^[1-9]\\d*\\s+[1-9]\\d*$"))
             throw new BadParam("TELEPORT");
 
-        String[] arr = param.split(" ");
+        String[] arr = param.split("\\s+");
 
         x = convert(arr[0]);
         y = convert(arr[1]);
@@ -42,12 +42,12 @@ public class Teleport implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
-        if(!field.isInited())
+        if(field == null || !field.isInited())
             throw new NotInitSurface("no inited", "TELEPORT");
 
         field.hideRobot(robot);
 
-        if(!robot.setCoordinates(x, y))
+        if(robot == null || !robot.setCoordinates(x, y))
             throw new BadCoordinates(robot.X(), robot.Y(), "TELEPORT");
         if(!field.displayRobot(robot))
             throw new NotInitSurface("null surface of Field", "TELEPORT");

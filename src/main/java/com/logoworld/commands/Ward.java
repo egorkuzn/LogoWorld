@@ -17,8 +17,11 @@ public class Ward implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws NotInitSurface {
-        if(!field.isInited())
-            throw new NotInitSurface("no inited", "MOVE");
+        if(field == null || !field.isInited())
+            throw new NotInitSurface("no inited", "WARD");
+
+        if(robot == null)
+            throw new NotInitSurface("robot object is NULL", "WARD");
 
         robot.setDrawerStatus(false);
     }

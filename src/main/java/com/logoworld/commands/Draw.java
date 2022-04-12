@@ -14,8 +14,11 @@ public class Draw implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws NotInitSurface {
-        if(!field.isInited())
-            throw new NotInitSurface("no inited", "MOVE");
+        if(field == null || !field.isInited())
+            throw new NotInitSurface("no inited", "DRAW");
+
+        if(robot == null)
+            throw new NotInitSurface("robot object is NULL", "DRAW");
 
         robot.setDrawerStatus(true);
     }
