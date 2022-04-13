@@ -10,4 +10,4 @@ So, to run and play with it you need to make some todo.txt file with command in 
 _EXAMPLE OF_ "todo.txt"_:_\
 INIT 25 8 0 0 > DRAW > MOVE R 5 > TELEPORT 24 7 > WARD > TELEPORT 0 0
 
-P.S. y
+P.S. if have some questions, I highly recommend you to look at code documentation in src files.  

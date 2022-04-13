@@ -7,7 +7,7 @@ import com.logoworld.exceptions.NotInitSurface;
 import java.util.logging.Logger;
 
 /**
- * This is the command sets draw mode on robot.
+ * This command sets draw mode on robot.
  * */
 
 public class Draw implements CommandAI{
@@ -37,11 +37,11 @@ public class Draw implements CommandAI{
     @Override
     public void action(Field field, Robot robot) throws NotInitSurface {
         log.info("Taking action");
+
         if(field == null || !field.isInited()) {
             log.info("Bad field obj");
             throw new NotInitSurface("no inited", "DRAW");
-        }
-        if(robot == null) {
+        } else if(robot == null) {
             log.info("NULL Robot obj");
             throw new NotInitSurface("robot object is NULL", "DRAW");
         }
