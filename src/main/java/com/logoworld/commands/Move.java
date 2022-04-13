@@ -33,7 +33,7 @@ public class Move implements CommandAI{
 
     @Override
     public void getParam(String param) throws BadParam {
-        if(param == null || !param.matches("^\\w+\\s+[1-9]\\d*$"))
+        if(param == null || !param.matches("^\\w+\\s+0$") && !param.matches("^\\w+\\s+[1-9]\\d*$"))
             throw new BadParam("MOVE");
 
         String[] arr = param.split("\\s+");
@@ -66,6 +66,9 @@ public class Move implements CommandAI{
         if(field == null || !field.isInited())
             throw new NotInitSurface("no INITed", "MOVE");
 
+        if(robot == null)
+            throw new NotInitSurface("null surface of Filed", "MOVE");
+
         for(int i = 0; i < steps; ++i){
             field.hideRobot(robot);
 
@@ -84,7 +87,7 @@ public class Move implements CommandAI{
                     break;
             }
 
-            if(robot == null || !field.displayRobot(robot))
+            if(!field.displayRobot(robot))
                 throw new NotInitSurface("null surface of Filed", "MOVE");
 
             try {

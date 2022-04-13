@@ -96,7 +96,7 @@ class TeleportTest {
             assertNotNull(e.getMessage());
         }
 
-        param = "9 9";
+        param = "0 0";
         try {
             field.setDisplayedSurface(10, 10, robot);
             obj.action(field, robot, param);
