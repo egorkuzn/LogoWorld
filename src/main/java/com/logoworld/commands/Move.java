@@ -33,7 +33,7 @@ public class Move implements CommandAI{
 
     @Override
     public void getParam(String param) throws BadParam {
-        if(!param.matches("^\\w+\\s+\\d$"))
+        if(param == null || !param.matches("^\\w+\\s+[1-9]\\d*$"))
             throw new BadParam("MOVE");
 
         String[] arr = param.split("\\s+");
@@ -63,7 +63,7 @@ public class Move implements CommandAI{
 
     @Override
     public void action(Field field, Robot robot) throws NotInitSurface, BadCoordinates {
-        if(!field.isInited())
+        if(field == null || !field.isInited())
             throw new NotInitSurface("no INITed", "MOVE");
 
         for(int i = 0; i < steps; ++i){
@@ -84,7 +84,7 @@ public class Move implements CommandAI{
                     break;
             }
 
-            if(!field.displayRobot(robot))
+            if(robot == null || !field.displayRobot(robot))
                 throw new NotInitSurface("null surface of Filed", "MOVE");
 
             try {

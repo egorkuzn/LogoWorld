@@ -35,7 +35,37 @@ class MoveTest {
             assertNotNull(e.getMessage());
         }
 
+        param = "Some text there";
+        try{
+            obj.getParam(param);
+            fail();
+        } catch (BadParam e){
+          assertNotNull(e.getMessage());
+        }
 
+        param = "L 90";
+        try{
+            obj.getParam(param);
+            assertNotNull("Good param");
+        } catch (BadParam e) {
+            fail(e.getMessage());
+        }
+
+        param = "R                100";
+        try {
+            obj.getParam(param);
+            assertNotNull("Good param");
+        } catch (BadParam e){
+            fail(e.getMessage());
+        }
+
+        param = "U 09";
+        try{
+            obj.getParam(param);
+            fail();
+        } catch (BadParam e) {
+            assertNotNull(e.getMessage());
+        }
     }
 
     @Test
