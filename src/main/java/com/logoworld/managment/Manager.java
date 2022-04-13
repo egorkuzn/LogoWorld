@@ -10,13 +10,14 @@ import com.logoworld.exceptions.NotInitSurface;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.*;
 
 public class Manager {
     private BufferedReader reader = null;
     private Field field = new Field();
     private Robot robot = new Robot();
-    private String toDo = null;
+    private String toDo = "/todo.txt";
     private ArrayList<CommandAI> managerTask = new ArrayList<CommandAI>();
     private HashMap<String, CommandAI> cashHistory = new HashMap<String, CommandAI>();
 
@@ -25,8 +26,21 @@ public class Manager {
     }
 
     public void getCommandsCall(String toDo){
+
         try {
             reader = new BufferedReader(new FileReader(toDo));
+            String call = reader.readLine();
+            run(call);
+        } catch (IOException e) {
+            System.out.println("Bad path to file. Redirecting to default todo...");
+            getCommandsCall();
+        }
+    }
+
+    public void getCommandsCall(){
+        try {
+            URL path = getClass().getResource(toDo);
+            reader = new BufferedReader(new FileReader(path.getPath()));
             String call = reader.readLine();
             run(call);
         } catch (IOException e) {

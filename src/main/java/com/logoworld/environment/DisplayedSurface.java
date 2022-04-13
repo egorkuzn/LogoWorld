@@ -1,5 +1,7 @@
 package com.logoworld.environment;
 
+import com.logoworld.exceptions.BadCoordinates;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -40,7 +42,7 @@ public class DisplayedSurface extends JFrame{
         setTitle("Logo World");
         setIconImage(getImage("icon"));
         setLocationRelativeTo(null);
-        setResizable(true);
+        setResizable(false);
         setVisible(true);
     }
 
@@ -56,9 +58,12 @@ public class DisplayedSurface extends JFrame{
                 data[y][x] = CellType.PURITY;
     }
 
-    public void setCell(int x, int y, CellType cell){
-        data[y][x] = cell;
-        repaint();
+    public void setCell(int x, int y, CellType cell) throws BadCoordinates {
+        if(y < height && x < width) {
+            data[y][x] = cell;
+            repaint();
+        } else
+            throw new BadCoordinates(x, y, "DisplayedSurface");
     }
 
     private Image getImage(String name){

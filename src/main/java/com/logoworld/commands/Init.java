@@ -45,25 +45,29 @@ public class Init implements CommandAI{
 
     @Override
     public void getParam(String param) throws BadParam {
-        if(!param.matches("^\\d+\\s+\\d+\\s+\\d+\\s+\\d$")) {
+        if(param == null || !param.matches("^([1-9]\\d*|0)(\\s+\\d+|\\s+0){3}$"))
             throw new BadParam("INIT");
-        }
 
         this.param = param;
-        String[] arr = param.split(" ");
+        String[] arr = param.split("\\s+");
 
         width = convert(arr[0]);
         height = convert(arr[1]);
         x = convert(arr[2]);
         y = convert(arr[3]);
 
-        if(!checkArgs()){
+        if(!checkArgs())
             throw new BadParam("INIT");
-        }
     }
 
     @Override
     public void action(Field field, Robot robot) throws BadCoordinates, NotInitSurface {
+        if(field == null)
+            throw new NotInitSurface("null surface of Filed", "INIT");
+
+        if(robot == null)
+            throw new NotInitSurface("null robot", "INIT");
+
         try {
             field.setDisplayedSurface(width, height, robot);
         } catch (InterruptedException e) {
@@ -71,6 +75,7 @@ public class Init implements CommandAI{
         }
 
         robot.setCoordinates(x,y);
+
         if(!field.displayRobot(robot))
             throw new NotInitSurface("null surface of Filed", "INIT");
     }

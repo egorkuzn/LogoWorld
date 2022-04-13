@@ -1,5 +1,7 @@
 package com.logoworld.environment;
 
+import com.logoworld.exceptions.BadCoordinates;
+
 public class Field {
     private int height = 0, width = 0;
     private DisplayedSurface surface = null;
@@ -16,7 +18,7 @@ public class Field {
         initColoredPoints();
     }
 
-    public boolean hideRobot(Robot robot){
+    public boolean hideRobot(Robot robot) throws BadCoordinates {
         if(surface != null){
             if(robot.getDrawerStatus())
                 addColoredPoint(robot.X(), robot.Y());
@@ -36,10 +38,15 @@ public class Field {
             if(robot.getDrawerStatus())
                 addColoredPoint(robot.X(), robot.Y());
 
-            if(isColoredPoint(robot.X(),robot.Y()))
-                surface.setCell(robot.X(), robot.Y(), CellType.COLORED_ROBOT);
-            else
-                surface.setCell(robot.X(), robot.Y(), CellType.ROBOT);
+            try {
+                if(isColoredPoint(robot.X(),robot.Y()))
+                    surface.setCell(robot.X(), robot.Y(), CellType.COLORED_ROBOT);
+                else
+                    surface.setCell(robot.X(), robot.Y(), CellType.ROBOT);
+            } catch (BadCoordinates e){
+                e.printStackTrace();
+                return false;
+            }
 
             return true;
         } else
